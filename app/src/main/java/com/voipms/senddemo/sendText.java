@@ -1,0 +1,159 @@
+package com.voipms.senddemo;
+
+import android.app.Activity;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.InputFilter;
+import android.text.InputType;
+import android.text.TextWatcher;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+
+import java.io.BufferedInputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+
+
+public class sendText extends Activity {
+
+    private EditText emailEditText;
+    private EditText passwordEditText;
+    private EditText didEditText;
+    private EditText destinationEditText;
+    private EditText messageEditText;
+    private EditText charactersRemainingEditText;
+    String email;
+    String password;
+    String did;
+    String destination;
+    String message;
+    String charactersRemaining;
+    String apiURL="https://voip.ms/api/v1/rest.php?";
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_send_text);
+
+        messageEditText=(EditText)findViewById(R.id.message);
+        //message.setFilters(new InputFilter[]{ new InputFilter.LengthFilter(getResources().getInteger(R.integer.messageMaxLength)) });
+        charactersRemainingEditText=(EditText)findViewById(R.id.charactersRemaining);
+        //message.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
+
+        messageEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                charactersRemainingEditText.setHint(""+(getResources().getInteger(R.integer.messageMaxLength)-messageEditText.length()));
+
+//                if((getResources().getInteger(R.integer.messageMaxLength)-messageEditText.length())>10)
+//                {
+//                    charactersRemainingEditText.setHint("");
+//                    messageEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
+//
+//                }
+//                else if((getResources().getInteger(R.integer.messageMaxLength)-messageEditText.length())>0)
+//                {
+//                    charactersRemainingEditText.setHint(""+(getResources().getInteger(R.integer.messageMaxLength)-messageEditText.length()));
+//                    //messageEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
+//
+//                }
+//                else
+//                {
+//                    charactersRemainingEditText.setHint(""+(getResources().getInteger(R.integer.messageMaxLength)-messageEditText.length()));
+//                    messageEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+//
+//                }
+
+            }
+        });
+
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.send_text, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void sendSMS(View view){
+        emailEditText=(EditText)findViewById(R.id.email);
+        passwordEditText=(EditText)findViewById(R.id.password);
+        didEditText=(EditText)findViewById(R.id.did);
+        destinationEditText=(EditText)findViewById(R.id.destination);
+        email=emailEditText.getText().toString();
+        password=passwordEditText.getText().toString();
+        did=didEditText.getText().toString();
+        destination=destinationEditText.getText().toString();
+        message=messageEditText.getText().toString();
+        //"https://voip.ms/api/v1/rest.php?api_username=john@domain.com&api_password=password&method=getServersInfo");
+        if(email != null && !email.isEmpty() && password != null && !password.isEmpty() && did != null && !did.isEmpty() && destination != null && !destination.isEmpty() && message != null && !message.isEmpty()&& message.length()<=160){
+            String urlString=apiURL+"api_username="+email+"&api_password="+password+"&method=sendSMS&did="+did+"&dst="+destination+"&message="+ Uri.encode(message);
+            new CallAPI().execute(urlString);
+        }
+
+    }
+
+    private class CallAPI extends AsyncTask<String,String,String>{
+        @Override
+        protected String doInBackground(String... params){
+
+            String urlString=params[0]; // URL to call
+
+            String resultToDisplay = "";
+
+            InputStream in = null;
+
+            // HTTP Get
+            try {
+
+                URL url = new URL(urlString);
+
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                in = new BufferedInputStream(urlConnection.getInputStream());
+
+            } catch (Exception e ) {
+
+                System.out.println(e.getMessage());
+
+                return e.getMessage();
+
+            }
+
+            return resultToDisplay;
+        }
+    }
+
+
+}

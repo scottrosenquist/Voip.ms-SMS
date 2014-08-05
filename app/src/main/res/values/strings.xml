@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Voip.ms SMS Send Demo</string>
+    <string name="action_settings">Settings</string>
+    <string name="emailHint">Email</string>
+    <string name="passwordHint">Password</string>
+    <string name="didHint">DID</string>
+    <string name="messageHint">Message</string>
+    <string name="sendText">Send</string>
+    <string name="destinationHint">Destination</string>
+    <string name="charactersRemainingHint">160</string>
+
+</resources>
