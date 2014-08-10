@@ -10,5 +10,11 @@
     <string name="sendText">Send</string>
     <string name="destinationHint">Destination</string>
     <string name="charactersRemainingHint">160</string>
+    <string name="pref_email" >Email</string>
+    <string name="pref_email_summ"></string>
+    <string name="pref_password">Password</string>
+    <string name="pref_password_summ"></string>
+    <string name="pref_did">DID</string>
+    <string name="pref_did_summ"></string>
 
 </resources>

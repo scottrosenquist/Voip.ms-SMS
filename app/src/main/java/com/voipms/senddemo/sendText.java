@@ -1,9 +1,12 @@
 package com.voipms.senddemo;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -22,9 +25,6 @@ import java.net.URLEncoder;
 
 public class sendText extends Activity {
 
-    private EditText emailEditText;
-    private EditText passwordEditText;
-    private EditText didEditText;
     private EditText destinationEditText;
     private EditText messageEditText;
     private EditText charactersRemainingEditText;
@@ -101,25 +101,26 @@ public class sendText extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+            Intent settings=new Intent(this,SettingsActivity.class);
+            startActivity(settings);
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     public void sendSMS(View view){
-        emailEditText=(EditText)findViewById(R.id.email);
-        passwordEditText=(EditText)findViewById(R.id.password);
-        didEditText=(EditText)findViewById(R.id.did);
+        SharedPreferences sharedPref= PreferenceManager.getDefaultSharedPreferences(this);
         destinationEditText=(EditText)findViewById(R.id.destination);
-        email=emailEditText.getText().toString();
-        password=passwordEditText.getText().toString();
-        did=didEditText.getText().toString();
+        email=sharedPref.getString("pref_email","");
+        password=sharedPref.getString("pref_password","");
+        did=sharedPref.getString("pref_did","");
         destination=destinationEditText.getText().toString();
         message=messageEditText.getText().toString();
         //"https://voip.ms/api/v1/rest.php?api_username=john@domain.com&api_password=password&method=getServersInfo");
         if(email != null && !email.isEmpty() && password != null && !password.isEmpty() && did != null && !did.isEmpty() && destination != null && !destination.isEmpty() && message != null && !message.isEmpty()&& message.length()<=160){
             String urlString=apiURL+"api_username="+email+"&api_password="+password+"&method=sendSMS&did="+did+"&dst="+destination+"&message="+ Uri.encode(message);
             new CallAPI().execute(urlString);
+            //System.out.println("Message sent.");
         }
 
     }
@@ -150,9 +151,11 @@ public class sendText extends Activity {
                 return e.getMessage();
 
             }
-
+            System.out.println(in);
             return resultToDisplay;
         }
+
+
     }
 
 

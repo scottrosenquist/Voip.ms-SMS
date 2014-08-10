@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+        <EditTextPreference
+            android:key="pref_email"
+            android:title="@string/pref_email"
+            android:summary="@string/pref_email_summ"
+            android:defaultValue=""
+            android:inputType="textEmailAddress"/>
+        <EditTextPreference
+            android:key="pref_password"
+            android:title="@string/pref_password"
+            android:summary="@string/pref_password_summ"
+            android:defaultValue=""
+            android:inputType="textPassword"/>
+        <EditTextPreference
+            android:key="pref_did"
+            android:title="@string/pref_did"
+            android:summary="@string/pref_did_summ"
+            android:defaultValue=""
+            android:inputType="phone"/>
+    </PreferenceScreen>
