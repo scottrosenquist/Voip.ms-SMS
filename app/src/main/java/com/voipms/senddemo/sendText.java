@@ -3,6 +3,8 @@ package com.voipms.senddemo;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -14,6 +16,7 @@ import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 
 import java.io.BufferedInputStream;
@@ -28,6 +31,8 @@ public class sendText extends Activity {
     private EditText destinationEditText;
     private EditText messageEditText;
     private EditText charactersRemainingEditText;
+    private Button sendButton;
+    ColorStateList defaultHintTextColor;
     String email;
     String password;
     String did;
@@ -35,6 +40,7 @@ public class sendText extends Activity {
     String message;
     String charactersRemaining;
     String apiURL="https://voip.ms/api/v1/rest.php?";
+    boolean messageTooLong=false;
 
 
     @Override
@@ -42,10 +48,13 @@ public class sendText extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send_text);
 
+        sendButton=(Button)findViewById(R.id.send);
         messageEditText=(EditText)findViewById(R.id.message);
         //message.setFilters(new InputFilter[]{ new InputFilter.LengthFilter(getResources().getInteger(R.integer.messageMaxLength)) });
         charactersRemainingEditText=(EditText)findViewById(R.id.charactersRemaining);
         //message.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
+        defaultHintTextColor=charactersRemainingEditText.getHintTextColors();
+
 
         messageEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -60,26 +69,42 @@ public class sendText extends Activity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                charactersRemainingEditText.setHint(""+(getResources().getInteger(R.integer.messageMaxLength)-messageEditText.length()));
+                //charactersRemainingEditText.setHint(""+(getResources().getInteger(R.integer.messageMaxLength)-messageEditText.length()));
 
-//                if((getResources().getInteger(R.integer.messageMaxLength)-messageEditText.length())>10)
-//                {
-//                    charactersRemainingEditText.setHint("");
+                if((getResources().getInteger(R.integer.messageMaxLength)-messageEditText.length())>10)
+                {
+                    charactersRemainingEditText.setHint("");
 //                    messageEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
-//
-//                }
+                    if(messageTooLong==true) {
+                        charactersRemainingEditText.setHintTextColor(defaultHintTextColor);
+                        sendButton.setEnabled(true);
+                        messageTooLong=false;
+                    }
+                }
 //                else if((getResources().getInteger(R.integer.messageMaxLength)-messageEditText.length())>0)
 //                {
 //                    charactersRemainingEditText.setHint(""+(getResources().getInteger(R.integer.messageMaxLength)-messageEditText.length()));
 //                    //messageEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
 //
 //                }
-//                else
-//                {
-//                    charactersRemainingEditText.setHint(""+(getResources().getInteger(R.integer.messageMaxLength)-messageEditText.length()));
+                else if((getResources().getInteger(R.integer.messageMaxLength)-messageEditText.length())>=0)
+                {
+                    charactersRemainingEditText.setHint(""+(getResources().getInteger(R.integer.messageMaxLength)-messageEditText.length()));
 //                    messageEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-//
-//                }
+                    if(messageTooLong==true) {
+                        charactersRemainingEditText.setHintTextColor(defaultHintTextColor);
+                        sendButton.setEnabled(true);
+                        messageTooLong=false;
+                    }
+                }
+                else {
+                    charactersRemainingEditText.setHint("" + (messageEditText.length() - getResources().getInteger(R.integer.messageMaxLength)));
+                    if(messageTooLong==false) {
+                        charactersRemainingEditText.setHintTextColor(Color.RED);
+                        sendButton.setEnabled(false);
+                        messageTooLong=true;
+                    }
+                }
 
             }
         });
