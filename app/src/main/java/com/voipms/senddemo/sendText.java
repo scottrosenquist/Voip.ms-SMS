@@ -18,12 +18,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 public class sendText extends Activity {
@@ -32,6 +37,7 @@ public class sendText extends Activity {
     private EditText messageEditText;
     private EditText charactersRemainingEditText;
     private Button sendButton;
+    TextView resultTextView;
     ColorStateList defaultHintTextColor;
     String email;
     String password;
@@ -41,6 +47,9 @@ public class sendText extends Activity {
     String charactersRemaining;
     String apiURL="https://voip.ms/api/v1/rest.php?";
     boolean messageTooLong=false;
+    boolean messageEmpty=true;
+    Date date;
+    DateFormat timeFormat;
 
 
     @Override
@@ -48,13 +57,13 @@ public class sendText extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send_text);
 
+
         sendButton=(Button)findViewById(R.id.send);
         messageEditText=(EditText)findViewById(R.id.message);
         //message.setFilters(new InputFilter[]{ new InputFilter.LengthFilter(getResources().getInteger(R.integer.messageMaxLength)) });
         charactersRemainingEditText=(EditText)findViewById(R.id.charactersRemaining);
         //message.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
         defaultHintTextColor=charactersRemainingEditText.getHintTextColors();
-
 
         messageEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -80,6 +89,16 @@ public class sendText extends Activity {
                         sendButton.setEnabled(true);
                         messageTooLong=false;
                     }
+                    if(messageEmpty&&messageEditText.length()==0){
+                        sendButton.setEnabled(false);
+                        messageEmpty=false;
+                    }
+                    else{
+                        sendButton.setEnabled(true);
+                        messageEmpty=true;
+                    }
+
+
                 }
 //                else if((getResources().getInteger(R.integer.messageMaxLength)-messageEditText.length())>0)
 //                {
@@ -105,6 +124,8 @@ public class sendText extends Activity {
                         messageTooLong=true;
                     }
                 }
+
+
 
             }
         });
@@ -136,6 +157,7 @@ public class sendText extends Activity {
     public void sendSMS(View view){
         SharedPreferences sharedPref= PreferenceManager.getDefaultSharedPreferences(this);
         destinationEditText=(EditText)findViewById(R.id.destination);
+        resultTextView=(TextView)findViewById(R.id.resultTextView);
         email=sharedPref.getString("pref_email","");
         password=sharedPref.getString("pref_password","");
         did=sharedPref.getString("pref_did","");
@@ -146,6 +168,14 @@ public class sendText extends Activity {
             String urlString=apiURL+"api_username="+email+"&api_password="+password+"&method=sendSMS&did="+did+"&dst="+destination+"&message="+ Uri.encode(message);
             new CallAPI().execute(urlString);
             //System.out.println("Message sent.");
+            messageEditText.setText("");
+            sendButton.setEnabled(false);
+
+            date=new Date(System.currentTimeMillis());
+            timeFormat= new SimpleDateFormat("h:mm aa");
+
+
+            resultTextView.setText("Message sent at "+timeFormat.format(date)+".");
         }
 
     }
